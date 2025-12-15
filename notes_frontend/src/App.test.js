@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('renders login or notes heading', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  // Depending on auth state, either "Welcome" (login) or "Your Notes" (notes view)
+  const heading = screen.getByText(/(Welcome|Your Notes)/i);
+  expect(heading).toBeInTheDocument();
 });

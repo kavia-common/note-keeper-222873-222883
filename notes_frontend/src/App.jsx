@@ -13,7 +13,7 @@ const theme = {
 function AppBar({ onLogout, loggedIn }) {
   return (
     <div style={{
-      background: theme.surface,
+      background: `linear-gradient(180deg, rgba(37,99,235,0.06), rgba(249,250,251,0))`,
       borderBottom: '1px solid #e5e7eb',
       padding: '12px 16px',
       display: 'flex',
@@ -23,11 +23,11 @@ function AppBar({ onLogout, loggedIn }) {
       top: 0,
       zIndex: 10
     }}>
-      <div style={{ fontWeight: 700, color: theme.primary }}>
+      <div style={{ fontWeight: 800, color: theme.primary, letterSpacing: 0.2 }}>
         Notes
       </div>
       {loggedIn && (
-        <button onClick={onLogout} style={buttonStyle('outline')}>
+        <button onClick={onLogout} style={buttonStyle('outline')} aria-label="Logout">
           Logout
         </button>
       )}
@@ -38,11 +38,12 @@ function AppBar({ onLogout, loggedIn }) {
 function buttonStyle(variant = 'primary') {
   const base = {
     padding: '8px 12px',
-    borderRadius: 8,
+    borderRadius: 10,
     border: '1px solid transparent',
     cursor: 'pointer',
     transition: 'all .2s ease',
-    fontWeight: 600
+    fontWeight: 600,
+    boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
   }
   if (variant === 'primary') {
     return { ...base, background: theme.primary, color: 'white' }
@@ -50,7 +51,7 @@ function buttonStyle(variant = 'primary') {
   if (variant === 'danger') {
     return { ...base, background: theme.error, color: 'white' }
   }
-  return { ...base, background: 'white', color: theme.text, borderColor: '#e5e7eb' }
+  return { ...base, background: theme.surface, color: theme.text, borderColor: '#e5e7eb' }
 }
 
 function Card({ children, style = {} }) {
@@ -58,8 +59,8 @@ function Card({ children, style = {} }) {
     <div style={{
       background: theme.surface,
       border: '1px solid #e5e7eb',
-      borderRadius: 12,
-      boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+      borderRadius: 14,
+      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.03)',
       padding: 16,
       ...style
     }}>
@@ -89,18 +90,18 @@ function LoginView({ onLogin }) {
   }
 
   return (
-    <div style={{ maxWidth: 360, margin: '64px auto', padding: '0 16px' }}>
-      <Card>
-        <h2 style={{ marginTop:0, marginBottom: 12 }}>Welcome</h2>
+    <div style={{ maxWidth: 420, margin: '96px auto', padding: '0 16px' }}>
+      <Card style={{ padding: 24 }}>
+        <h2 style={{ marginTop:0, marginBottom: 4, color: theme.text }}>Welcome</h2>
         <p style={{ color: '#374151', marginTop:0 }}>Sign in to manage your notes.</p>
         <form onSubmit={submit} style={{ marginTop: 16 }}>
           <div style={{ marginBottom: 12 }}>
-            <label style={{ display: 'block', fontSize: 14, marginBottom: 6 }}>Username</label>
+            <label style={{ display: 'block', fontSize: 13, marginBottom: 6, color:'#374151' }}>Username</label>
             <input value={username} onChange={e=>setUsername(e.target.value)} required
               style={inputStyle} placeholder="Enter username" />
           </div>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 14, marginBottom: 6 }}>Password</label>
+            <label style={{ display: 'block', fontSize: 13, marginBottom: 6, color:'#374151' }}>Password</label>
             <input type="password" value={password} onChange={e=>setPassword(e.target.value)} required
               style={inputStyle} placeholder="Enter password" />
           </div>
@@ -117,10 +118,11 @@ function LoginView({ onLogin }) {
 const inputStyle = {
   width: '100%',
   padding: '10px 12px',
-  borderRadius: 8,
+  borderRadius: 10,
   border: '1px solid #e5e7eb',
   outline: 'none',
-  fontSize: 14
+  fontSize: 14,
+  transition: 'border-color .2s ease, box-shadow .2s ease'
 }
 
 function NotesView() {
@@ -137,7 +139,7 @@ function NotesView() {
     setError('')
     try {
       const data = await api.listNotes()
-      setNotes(data)
+      setNotes(Array.isArray(data) ? data : [])
     } catch (err) {
       setError(err.message || 'Failed to load notes')
     } finally {
@@ -166,7 +168,7 @@ function NotesView() {
     }
   }
 
-  async function startEdit(note) {
+  function startEdit(note) {
     setEditingId(note.id)
     setTitle(note.title)
     setContent(note.content)
@@ -199,19 +201,19 @@ function NotesView() {
   }
 
   return (
-    <div style={{ maxWidth: 960, margin: '24px auto', padding: '0 16px' }}>
+    <div style={{ maxWidth: 1000, margin: '24px auto', padding: '0 16px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'start' }}>
         <Card>
-          <h3 style={{ marginTop:0 }}>{editingId ? 'Edit Note' : 'Create Note'}</h3>
+          <h3 style={{ marginTop:0, color: theme.text }}>{editingId ? 'Edit Note' : 'Create Note'}</h3>
           <form onSubmit={editingId ? saveEdit : submitNew}>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 14, marginBottom: 6 }}>Title</label>
+              <label style={{ display: 'block', fontSize: 13, marginBottom: 6, color:'#374151' }}>Title</label>
               <input value={title} onChange={e=>setTitle(e.target.value)} required style={inputStyle} />
             </div>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 14, marginBottom: 6 }}>Content</label>
+              <label style={{ display: 'block', fontSize: 13, marginBottom: 6, color:'#374151' }}>Content</label>
               <textarea value={content} onChange={e=>setContent(e.target.value)} required
-                style={{ ...inputStyle, minHeight: 120, fontFamily: 'inherit' }} />
+                style={{ ...inputStyle, minHeight: 140, fontFamily: 'inherit' }} />
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button type="submit" style={buttonStyle('primary')} disabled={saving}>
@@ -228,8 +230,8 @@ function NotesView() {
         <div>
           <Card>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: 8 }}>
-              <h3 style={{ margin: 0 }}>Your Notes</h3>
-              <button style={buttonStyle('outline')} onClick={load}>Refresh</button>
+              <h3 style={{ margin: 0, color: theme.text }}>Your Notes</h3>
+              <button style={buttonStyle('outline')} onClick={load} aria-label="Refresh notes">Refresh</button>
             </div>
             {loading ? (
               <div>Loading...</div>
@@ -274,7 +276,7 @@ export default function App() {
   }
 
   return (
-    <div>
+    <div style={{ background: theme.background, minHeight: '100vh' }}>
       <AppBar onLogout={handleLogout} loggedIn={loggedIn} />
       {loggedIn ? (
         <NotesView />
